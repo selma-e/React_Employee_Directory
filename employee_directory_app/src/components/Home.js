@@ -13,29 +13,33 @@ class Home extends Component {
     };
   }
 
-  submitInput = (event) => {
+  // use handleFilter function with array.filter
+  enterInput = (event) => {
     event.preventDefault();
     const name = event.target.name;
     const value = event.target.value;
-    console.log("You are in the submit button");
-    console.log(name);
+    console.log("You have pushed down on the keyboard");
     console.log(value);
-    this.setState(
-      {
-        [name]: value,
-      },
-      () => {
-        console.log("You're setting the new state");
-      }
-    );
+    this.setState({
+      [name]: value,
+    });
   };
 
+  // use .sort
   sortName = () => {
     console.log("You have clicked the sort by name button");
+    this.sortFunc();
   };
 
   componentDidMount() {
     this.fetchUsers();
+  }
+
+  componentWillUnmount() {
+    // fix Warning: Can't perform a React state update on an unmounted component
+    this.setState = (state, callback) => {
+      return;
+    };
   }
 
   fetchUsers = (query) => {
@@ -43,8 +47,37 @@ class Home extends Component {
       .then((res) => this.setState({ result: res.data.results, ready: true }))
       .catch((err) => console.log(err));
   };
+
+  filterFunc = () => {
+    let array = this.state.result;
+    var filter = new RegExp(this.state.search, "i");
+    let newArray = array.filter(
+      (result) =>
+        filter.test(result.name.first) || filter.test(result.name.last)
+    );
+    // this.setState({ result: newArray });
+    return newArray;
+  };
+
+  sortFunc = () => {
+    this.state.result.sort(function (a, b) {
+      var nameA = a.name.first.toUpperCase(); // ignore upper and lowercase
+      var nameB = b.name.first.toUpperCase(); // ignore upper and lowercase
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+
+      // names must be equal
+      return 0;
+    });
+  };
+
   render() {
     if (this.state.ready) {
+      this.sortFunc();
       return (
         <>
           <div className="jumbotron jumbotron-fluid p-3 mb-2 bg-dark text-white">
@@ -61,14 +94,13 @@ class Home extends Component {
           <div className="container">
             <div className="input-group rounded mt-3">
               <input
-                type="search"
+                name="search"
+                type="text"
                 className="form-control rounded mx-auto"
                 style={{ width: "200px" }}
                 placeholder="Search"
+                onChange={this.enterInput}
               />
-              <button onClick={this.submitInput} className="btn btn-primary">
-                <i className="fas fa-search"></i>
-              </button>
             </div>
 
             <table className="table table-striped mt-4">
@@ -84,8 +116,7 @@ class Home extends Component {
                 </tr>
               </thead>
               <tbody>
-                {this.state.result.map((employee, index) => {
-                  // return <TableRow {...employee, key = index} />;
+                {this.filterFunc().map((employee, index) => {
                   let date = new Date(employee.dob.date).toLocaleDateString();
                   return (
                     <TableRow
@@ -99,51 +130,6 @@ class Home extends Component {
                     />
                   );
                 })}
-                {/* <tr>
-                  <th scope="row">
-                    <img src={this.state.result.picture.thumbnail} alt="" />
-                  </th>
-                  <td>
-                    {this.state.result.name.first} {this.state.result.name.last}
-                  </td>
-                  <td>{this.state.result.phone}</td>
-                  <td>
-                    <a href="mailto: {this.state.result.email}">
-                      {this.state.result.email}
-                    </a>
-                  </td>
-                  <td>{this.state.result.dob.date}</td>
-                </tr>
-                <tr> */}
-                {/* <th scope="row">
-                    <img src={this.state.result.picture.thumbnail} alt="" />
-                  </th>
-                  <td>
-                    {this.state.result.name.first} {this.state.result.name.last}
-                  </td>
-                  <td>{this.state.result.phone}</td>
-                  <td>
-                    <a href="mailto: {this.state.result.email}">
-                      {this.state.result.email}
-                    </a>
-                  </td>
-                  <td>{this.state.result.dob.date}</td>
-                </tr>
-                <tr>
-                  <th scope="row">
-                    <img src={this.state.result.picture.thumbnail} alt="" />
-                  </th>
-                  <td>
-                    {this.state.result.name.first} {this.state.result.name.last}
-                  </td>
-                  <td>{this.state.result.phone}</td>
-                  <td>
-                    <a href="mailto: {this.state.result.email}">
-                      {this.state.result.email}
-                    </a>
-                  </td>
-                  <td>{this.state.result.dob.date}</td>
-                </tr> */}
               </tbody>
             </table>
           </div>
