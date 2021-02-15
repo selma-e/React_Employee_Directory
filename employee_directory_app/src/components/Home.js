@@ -85,9 +85,8 @@ class Home extends Component {
               <h1 className="display-4 mx-auto" style={{ width: "200px" }}>
                 Employee Directory
               </h1>
-              <p className="lead mx-auto" style={{ width: "600px" }}>
-                Click on a caret to filter or use the search box to narrow your
-                results.
+              <p className="lead mx-auto" style={{ width: "350px" }}>
+                Use the search box to narrow your results.
               </p>
             </div>
           </div>
